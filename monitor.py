@@ -60,7 +60,8 @@ HEADERS = {
 
 def http_get_json(url: str):
     req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=30) as resp:
+            body = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", errors="replace")
+            print(f"[DEBUG] Respuesta CallMeBot: {body[:300]}")
         body = resp.read().decode("utf-8", errors="replace")
         if not body.strip():
             return []
