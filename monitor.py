@@ -60,8 +60,7 @@ HEADERS = {
 
 def http_get_json(url: str):
     req = urllib.request.Request(url, headers=HEADERS)
-    body = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", errors="replace")
-    print(f"[DEBUG] Respuesta CallMeBot: {body[:300]}")
+    with urllib.request.urlopen(req, timeout=30) as resp:
         body = resp.read().decode("utf-8", errors="replace")
         if not body.strip():
             return []
@@ -189,6 +188,7 @@ def notify_discord(products: dict):
 
 def notify_whatsapp(products: dict):
     if not (CALLMEBOT_PHONE and CALLMEBOT_APIKEY):
+        print("[WARN] CALLMEBOT_PHONE o CALLMEBOT_APIKEY no configurados, omito WhatsApp.")
         return
     for info in products.values():
         sizes_txt = ", ".join(s["size"] for s in info["sizes"])
@@ -201,7 +201,8 @@ def notify_whatsapp(products: dict):
         )
         try:
             req = urllib.request.Request(url, headers=HEADERS)
-            urllib.request.urlopen(req, timeout=30).read()
+            body = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", errors="replace")
+            print(f"[DEBUG] Respuesta CallMeBot: {body[:300]}")
             print("[OK] Notificación enviada a WhatsApp (CallMeBot).")
         except Exception as e:
             print(f"[ERROR] WhatsApp falló: {e}")
